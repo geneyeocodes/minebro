@@ -17,19 +17,55 @@ const assetsDir = path.resolve(
 
 const itemsDir = path.join(assetsDir, "items");
 const blocksDir = path.join(assetsDir, "blocks");
+
+// Local public assets directory
+const publicAssetsDir = path.resolve(__dirname, "../../public/assets");
+
 const mcData = MinecraftData(VERSION);
 
-const getRelativePathIfExists = (filePath) =>
-  fs.existsSync(filePath) ? path.relative(__dirname, filePath) : null;
+// Make sure public/assets exists
+fs.mkdirSync(publicAssetsDir, { recursive: true });
 
-const getItemImagePath = (itemName) =>
-  getRelativePathIfExists(path.join(itemsDir, `${itemName}.png`)) ||
-  getRelativePathIfExists(path.join(blocksDir, `${itemName}.png`));
+const getSourceImagePath = (itemName) => {
+  const itemImage = path.join(itemsDir, `${itemName}.png`);
+
+  if (fs.existsSync(itemImage)) {
+    return itemImage;
+  }
+
+  const blockImage = path.join(blocksDir, `${itemName}.png`);
+
+  if (fs.existsSync(blockImage)) {
+    return blockImage;
+  }
+
+  return null;
+};
+
+const copyItemImage = (itemName) => {
+  const sourcePath = getSourceImagePath(itemName);
+
+  if (!sourcePath) {
+    return null;
+  }
+
+  const fileName = `${itemName}.png`;
+  const destinationPath = path.join(publicAssetsDir, fileName);
+
+  fs.copyFileSync(sourcePath, destinationPath);
+
+  // Public assets are served from the site root
+  return `/assets/${fileName}`;
+};
 
 const formattedItems = mcData.itemsArray
   .map((item) => {
-    const image = getItemImagePath(item.name);
-    if (!image) return null;
+    const image = copyItemImage(item.name);
+
+    // Skip items that don't have an available image
+    if (!image) {
+      return null;
+    }
 
     const rawRecipes = mcData.recipes[item.id];
 
@@ -38,23 +74,26 @@ const formattedItems = mcData.itemsArray
 
     if (rawRecipes) {
       const shapedRecipe = rawRecipes.find((entry) => entry.inShape);
+
       if (shapedRecipe) {
         grid = Array.from({ length: 3 }, () => Array(3).fill(null));
+
         let hasMissingImage = false;
 
         shapedRecipe.inShape.forEach((row, rIdx) => {
-          if (rIdx < 3) {
-            row.forEach((ingredientId, cIdx) => {
-              if (cIdx < 3 && ingredientId !== null && ingredientId !== -1) {
-                const ingItem = mcData.items[ingredientId];
-                if (ingItem && getItemImagePath(ingItem.name)) {
-                  grid[rIdx][cIdx] = ingItem.name;
-                } else {
-                  hasMissingImage = true;
-                }
+          if (rIdx >= 3) return;
+
+          row.forEach((ingredientId, cIdx) => {
+            if (cIdx < 3 && ingredientId !== null && ingredientId !== -1) {
+              const ingItem = mcData.items[ingredientId];
+
+              if (ingItem && getSourceImagePath(ingItem.name)) {
+                grid[rIdx][cIdx] = ingItem.name;
+              } else {
+                hasMissingImage = true;
               }
-            });
-          }
+            }
+          });
         });
 
         // If an ingredient is missing an image, clear the recipe grid
@@ -75,6 +114,11 @@ const formattedItems = mcData.itemsArray
   .filter((item) => item !== null);
 
 const outputPath = path.join(__dirname, "gameItems.json");
+
 fs.writeFileSync(outputPath, JSON.stringify(formattedItems, null, 2));
 
 console.log(`Successfully generated data for ${formattedItems.length} items!`);
+
+console.log(`Copied item images to: ${publicAssetsDir}`);
+
+console.log(`Generated JSON at: ${outputPath}`);
