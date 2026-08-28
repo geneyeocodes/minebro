@@ -1,0 +1,1036 @@
+/* =========================================================
+   MineBroo — Minecraft-inspired UI
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+:root {
+  --bg-dark: #101410;
+  --bg-stone: #242824;
+  --bg-stone-light: #303630;
+  --stone-border: #111511;
+
+  --wood-dark: #3a2415;
+  --wood: #654321;
+  --wood-light: #8a6038;
+
+  --grass-dark: #276322;
+  --grass: #3f8f2f;
+  --grass-light: #62b34a;
+
+  --gold: #e0b83f;
+  --text: #f1f1e8;
+  --text-muted: #aaafa5;
+
+  --slot: #8b8b8b;
+  --slot-dark: #5d5d5d;
+  --slot-light: #bdbdbd;
+
+  --danger: #a83232;
+
+  font-family: "Press Start 2P", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    repeating-linear-gradient(
+      0deg,
+      #171b17 0px,
+      #171b17 4px,
+      #141814 4px,
+      #141814 8px
+    );
+
+  color: var(--text);
+}
+
+/* =========================================================
+   Main App
+   ========================================================= */
+
+.app-container {
+  min-height: 100vh;
+  background: radial-gradient(
+    circle at top,
+    rgba(80, 130, 55, 0.12),
+    transparent 40%
+  );
+}
+
+.app-header {
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+
+  background: linear-gradient(90deg, #20251f 0%, #30372d 50%, #20251f 100%);
+
+  border-bottom: 5px solid #111511;
+  box-shadow:
+    0 4px 0 #465044,
+    0 8px 18px rgba(0, 0, 0, 0.45);
+
+  position: relative;
+  z-index: 10;
+}
+
+.app-header h1 {
+  margin: 0;
+  color: #76d957;
+  font-size: 22px;
+  letter-spacing: 2px;
+  text-shadow:
+    3px 3px 0 #1c4818,
+    5px 5px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+
+.app-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  border: 3px solid #111511;
+  border-top-color: #697269;
+  border-left-color: #697269;
+
+  background: #454b45;
+  color: #ddd;
+
+  padding: 13px 18px;
+
+  font-family: inherit;
+  font-size: 10px;
+
+  cursor: pointer;
+
+  box-shadow:
+    3px 3px 0 #161916,
+    inset -3px -3px 0 #303530,
+    inset 3px 3px 0 #5b625b;
+
+  transition:
+    transform 0.08s,
+    background 0.08s;
+}
+
+.nav-btn:hover {
+  background: #555d54;
+  color: white;
+}
+
+.nav-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    1px 1px 0 #161916,
+    inset -2px -2px 0 #303530;
+}
+
+.nav-btn.active {
+  background: var(--grass);
+  color: white;
+
+  border-top-color: #75bd60;
+  border-left-color: #75bd60;
+
+  box-shadow:
+    3px 3px 0 #163514,
+    inset -3px -3px 0 #276122,
+    inset 3px 3px 0 #61aa4c;
+}
+
+/* =========================================================
+   Content
+   ========================================================= */
+
+.app-content {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 35px;
+}
+
+/* =========================================================
+   Catalog
+   ========================================================= */
+
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 25px;
+  align-items: stretch;
+}
+
+.catalog-sidebar,
+.catalog-detail {
+  background: #292e29;
+
+  border: 4px solid #111511;
+  border-top-color: #565e56;
+  border-left-color: #565e56;
+
+  box-shadow:
+    5px 5px 0 #101310,
+    inset -4px -4px 0 #1c201c,
+    inset 4px 4px 0 #3b423b;
+}
+
+/* =========================================================
+   Search
+   ========================================================= */
+
+.catalog-sidebar {
+  padding: 18px;
+}
+
+.search-input {
+  width: 100%;
+  height: 46px;
+
+  background: #171a17;
+  color: white;
+
+  border: 3px solid #0b0d0b;
+  border-top-color: #606860;
+  border-left-color: #606860;
+
+  outline: none;
+
+  padding: 10px 12px;
+
+  font-family: inherit;
+  font-size: 9px;
+
+  box-shadow:
+    inset 3px 3px 0 #0c0e0c,
+    2px 2px 0 #111;
+}
+
+.search-input::placeholder {
+  color: #777d77;
+}
+
+.search-input:focus {
+  border-top-color: var(--grass-light);
+  border-left-color: var(--grass-light);
+}
+
+/* =========================================================
+   Item List
+   ========================================================= */
+
+.item-list {
+  margin-top: 15px;
+
+  max-height: calc(100vh - 190px);
+  overflow-y: auto;
+
+  padding-right: 5px;
+}
+
+.item-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.item-list::-webkit-scrollbar-track {
+  background: #151815;
+}
+
+.item-list::-webkit-scrollbar-thumb {
+  background: #555c55;
+  border: 2px solid #151815;
+}
+
+.item-row {
+  min-height: 54px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 8px;
+
+  margin-bottom: 6px;
+
+  background: #353a35;
+
+  border: 3px solid #171a17;
+  border-top-color: #5d655d;
+  border-left-color: #5d655d;
+
+  cursor: pointer;
+
+  box-shadow: inset -3px -3px 0 #282c28;
+
+  transition: background 0.1s;
+}
+
+.item-row:hover {
+  background: #444b44;
+}
+
+.item-row.active {
+  background: #3d8131;
+
+  border-top-color: #70b95c;
+  border-left-color: #70b95c;
+
+  box-shadow:
+    inset -3px -3px 0 #285721,
+    3px 0 0 #1a4215;
+}
+
+.item-icon,
+.detail-icon {
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.item-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.item-icon-placeholder {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+
+  background: #191c19;
+
+  border: 2px solid #0d0f0d;
+}
+
+.item-name {
+  font-size: 8px;
+  line-height: 1.5;
+  color: #eee;
+}
+
+/* =========================================================
+   Catalog Detail
+   ========================================================= */
+
+.catalog-detail {
+  padding: 30px;
+  min-height: 600px;
+}
+
+.detail-container {
+  max-width: 700px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding-bottom: 25px;
+  border-bottom: 3px solid #171a17;
+}
+
+.detail-icon {
+  width: 64px;
+  height: 64px;
+
+  padding: 7px;
+
+  background: #171a17;
+
+  border: 4px solid #0d0f0d;
+  border-top-color: #707870;
+  border-left-color: #707870;
+
+  box-shadow: inset -3px -3px 0 #303530;
+}
+
+.detail-icon-placeholder {
+  width: 64px;
+  height: 64px;
+  background: #171a17;
+}
+
+.detail-header h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #7bd85d;
+
+  text-shadow: 2px 2px #183d13;
+}
+
+.item-id {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 8px;
+  line-height: 1.8;
+}
+
+.item-id code {
+  color: #e2c45c;
+}
+
+/* =========================================================
+   Recipe Card
+   ========================================================= */
+
+.properties-card {
+  margin-top: 28px;
+
+  background: #202420;
+
+  border: 4px solid #101310;
+  border-top-color: #555d55;
+  border-left-color: #555d55;
+
+  padding: 25px;
+
+  box-shadow: inset -4px -4px 0 #181b18;
+}
+
+.properties-card h3 {
+  margin: 0 0 20px;
+
+  color: #f0c94d;
+  font-size: 12px;
+
+  text-shadow: 2px 2px #4d3910;
+}
+
+.recipe-box {
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+}
+
+/* =========================================================
+   Minecraft Crafting Grid
+   ALWAYS 3x3
+   ========================================================= */
+
+.crafting-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 76px);
+  grid-template-rows: repeat(3, 76px);
+
+  gap: 5px;
+
+  padding: 8px;
+
+  background: #555a55;
+
+  border: 4px solid #111411;
+  border-top-color: #858a85;
+  border-left-color: #858a85;
+
+  box-shadow:
+    inset -4px -4px 0 #343934,
+    inset 4px 4px 0 #666b66;
+}
+
+.crafting-slot {
+  width: 76px;
+  height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  background: #8b8b8b;
+
+  border: 3px solid #3f423f;
+  border-top-color: #c1c1c1;
+  border-left-color: #c1c1c1;
+
+  box-shadow:
+    inset -3px -3px 0 #6a6a6a,
+    inset 3px 3px 0 #a9a9a9;
+}
+
+.crafting-slot img {
+  width: 42px;
+  height: 42px;
+
+  object-fit: contain;
+  image-rendering: pixelated;
+
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.45));
+}
+
+.crafting-slot.clickable {
+  cursor: pointer;
+}
+
+.crafting-slot.clickable:hover {
+  background: #9cbd77;
+
+  border-top-color: #e0e9c7;
+  border-left-color: #e0e9c7;
+}
+
+.slot-fallback-text {
+  font-size: 7px;
+  color: #202420;
+  text-align: center;
+  word-break: break-word;
+}
+
+/* =========================================================
+   Game
+   ========================================================= */
+
+.game-container {
+  min-height: 650px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)), #242824;
+
+  border: 5px solid #111511;
+  border-top-color: #555d55;
+  border-left-color: #555d55;
+
+  box-shadow:
+    6px 6px 0 #0d0f0d,
+    inset -5px -5px 0 #191c19,
+    inset 5px 5px 0 #3a403a;
+
+  padding: 35px;
+}
+
+/* =========================================================
+   Idle / Game Over
+   ========================================================= */
+
+.game-idle-screen,
+.game-over-screen {
+  text-align: center;
+  max-width: 650px;
+
+  padding: 45px;
+
+  background: #303630;
+
+  border: 5px solid #111511;
+  border-top-color: #656d65;
+  border-left-color: #656d65;
+
+  box-shadow:
+    7px 7px 0 #101310,
+    inset -5px -5px 0 #202420,
+    inset 5px 5px 0 #444b44;
+}
+
+.game-idle-screen h2,
+.game-over-screen h2 {
+  margin-top: 0;
+
+  color: #79d45c;
+  font-size: 18px;
+  line-height: 1.6;
+
+  text-shadow: 3px 3px #1d4818;
+}
+
+.game-idle-screen p,
+.game-over-screen p {
+  color: #c1c6c1;
+  font-size: 9px;
+  line-height: 2;
+
+  margin: 25px 0 35px;
+}
+
+.game-idle-screen strong {
+  color: #e2c34d;
+}
+
+/* =========================================================
+   Minecraft Buttons
+   ========================================================= */
+
+.game-start-btn,
+.game-restart-btn,
+.game-skip-btn {
+  font-family: inherit;
+  cursor: pointer;
+  color: white;
+
+  border: 3px solid #111;
+  border-top-color: #79bd65;
+  border-left-color: #79bd65;
+
+  background: #3d8730;
+
+  box-shadow:
+    4px 4px 0 #193b15,
+    inset -3px -3px 0 #286020,
+    inset 3px 3px 0 #5ca749;
+
+  transition:
+    transform 0.08s,
+    filter 0.08s;
+}
+
+.game-start-btn,
+.game-restart-btn {
+  padding: 16px 25px;
+  font-size: 10px;
+}
+
+.game-start-btn:hover,
+.game-restart-btn:hover,
+.game-skip-btn:hover {
+  filter: brightness(1.15);
+}
+
+.game-start-btn:active,
+.game-restart-btn:active,
+.game-skip-btn:active {
+  transform: translate(3px, 3px);
+
+  box-shadow:
+    1px 1px 0 #193b15,
+    inset -2px -2px 0 #286020;
+}
+
+/* =========================================================
+   Game Playing
+   ========================================================= */
+
+.game-playing-screen {
+  width: 100%;
+  max-width: 850px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* =========================================================
+   Scoreboard
+   ========================================================= */
+
+.game-scoreboard {
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+
+  padding: 14px 18px;
+  margin-bottom: 20px;
+
+  background: #151815;
+
+  border: 3px solid #080a08;
+  border-top-color: #555c55;
+  border-left-color: #555c55;
+
+  font-size: 10px;
+
+  box-shadow: inset -3px -3px 0 #0b0d0b;
+}
+
+.game-scoreboard span:first-child {
+  color: #e4c34c;
+}
+
+.game-scoreboard span:last-child {
+  color: #65d151;
+}
+
+/* =========================================================
+   Target Banner
+   ========================================================= */
+
+.game-target-banner {
+  width: 100%;
+
+  min-height: 70px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 12px 16px;
+  margin-bottom: 25px;
+
+  background: #333933;
+
+  border: 4px solid #121512;
+  border-top-color: #626962;
+  border-left-color: #626962;
+
+  box-shadow:
+    inset -4px -4px 0 #252925,
+    inset 4px 4px 0 #454c45;
+}
+
+.game-target-banner > span {
+  color: #aaa;
+  font-size: 9px;
+}
+
+.game-target-banner img {
+  width: 36px;
+  height: 36px;
+
+  image-rendering: pixelated;
+
+  filter: drop-shadow(2px 2px 0 #111);
+}
+
+.game-target-banner strong {
+  flex: 1;
+
+  color: #f0ce51;
+  font-size: 11px;
+  line-height: 1.5;
+
+  text-shadow: 2px 2px #453610;
+}
+
+.game-skip-btn {
+  padding: 9px 12px;
+
+  background: #555b55;
+
+  border-top-color: #929892;
+  border-left-color: #929892;
+
+  box-shadow:
+    3px 3px 0 #171a17,
+    inset -3px -3px 0 #393e39,
+    inset 3px 3px 0 #707670;
+
+  font-size: 7px;
+}
+
+.game-skip-btn:hover {
+  background: #666d66;
+}
+
+/* =========================================================
+   Player Grid
+   ALWAYS 3x3
+   ========================================================= */
+
+.game-player-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 92px);
+  grid-template-rows: repeat(3, 92px);
+
+  gap: 6px;
+
+  padding: 10px;
+
+  background: #575c57;
+
+  border: 5px solid #111411;
+  border-top-color: #8b908b;
+  border-left-color: #8b908b;
+
+  box-shadow:
+    inset -5px -5px 0 #343934,
+    inset 5px 5px 0 #6a706a,
+    6px 6px 0 #111;
+}
+
+.game-grid-slot {
+  width: 92px;
+  height: 92px;
+
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #898989;
+
+  border: 4px solid #414341;
+  border-top-color: #c2c2c2;
+  border-left-color: #c2c2c2;
+
+  box-shadow:
+    inset -4px -4px 0 #666,
+    inset 4px 4px 0 #aaa;
+
+  cursor: pointer;
+
+  transition:
+    background 0.08s,
+    transform 0.08s;
+}
+
+.game-grid-slot:hover {
+  background: #999;
+}
+
+.game-grid-slot.selected {
+  background: #b8a83f;
+
+  border-top-color: #f0df79;
+  border-left-color: #f0df79;
+
+  box-shadow:
+    inset -4px -4px 0 #7d7126,
+    inset 4px 4px 0 #dfcf64,
+    0 0 0 3px #e6c84b;
+
+  z-index: 2;
+}
+
+.game-grid-slot img {
+  width: 48px;
+  height: 48px;
+
+  image-rendering: pixelated;
+
+  filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.5));
+}
+
+.game-slot-key {
+  position: absolute;
+
+  top: 5px;
+  left: 6px;
+
+  color: #383838;
+
+  font-size: 8px;
+  font-weight: bold;
+
+  opacity: 0.75;
+
+  pointer-events: none;
+}
+
+.game-grid-slot.selected .game-slot-key {
+  color: #4e4210;
+}
+
+/* =========================================================
+   Ingredient Pool
+   ========================================================= */
+
+.game-ingredient-pool {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+  margin-top: 30px;
+
+  padding: 18px;
+
+  background: #1a1d1a;
+
+  border: 4px solid #0b0d0b;
+  border-top-color: #4c534c;
+  border-left-color: #4c534c;
+
+  box-shadow: inset -4px -4px 0 #111411;
+}
+
+.pool-item {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #808080;
+
+  border: 3px solid #3b3d3b;
+  border-top-color: #b8b8b8;
+  border-left-color: #b8b8b8;
+
+  box-shadow:
+    inset -3px -3px 0 #5e5e5e,
+    inset 3px 3px 0 #9e9e9e;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.08s,
+    background 0.08s;
+}
+
+.pool-item:hover {
+  background: #92ad73;
+  transform: translateY(-2px);
+
+  border-top-color: #d1e5af;
+  border-left-color: #d1e5af;
+}
+
+.pool-item:active {
+  transform: translateY(2px);
+}
+
+.pool-item img {
+  width: 36px;
+  height: 36px;
+
+  image-rendering: pixelated;
+
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.5));
+}
+
+.pool-fallback-text {
+  font-size: 7px;
+  color: #222;
+  text-align: center;
+}
+
+/* =========================================================
+   Game Over
+   ========================================================= */
+
+.game-over-screen h2 {
+  color: #e25b4f;
+  text-shadow: 3px 3px #4c1814;
+}
+
+.game-over-screen p strong {
+  color: #e3c64c;
+  font-size: 14px;
+}
+
+/* =========================================================
+   Pixel Image Rendering
+   ========================================================= */
+
+img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* =========================================================
+   Responsive Layout
+   ========================================================= */
+
+@media (max-width: 850px) {
+  .app-header {
+    height: auto;
+    min-height: 80px;
+
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+
+    padding: 18px;
+  }
+
+  .app-content {
+    padding: 20px;
+  }
+
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .item-list {
+    max-height: 300px;
+  }
+
+  .catalog-detail {
+    min-height: auto;
+  }
+
+  .game-container {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-header h1 {
+    font-size: 16px;
+  }
+
+  .nav-btn {
+    padding: 10px;
+    font-size: 7px;
+  }
+
+  .catalog-detail {
+    padding: 18px;
+  }
+
+  .detail-header h2 {
+    font-size: 12px;
+  }
+
+  /* Smaller 3x3 crafting grid */
+  .crafting-grid {
+    grid-template-columns: repeat(3, 58px);
+    grid-template-rows: repeat(3, 58px);
+  }
+
+  .crafting-slot {
+    width: 58px;
+    height: 58px;
+  }
+
+  /* Smaller 3x3 game grid */
+  .game-player-grid {
+    grid-template-columns: repeat(3, 72px);
+    grid-template-rows: repeat(3, 72px);
+  }
+
+  .game-grid-slot {
+    width: 72px;
+    height: 72px;
+  }
+
+  .game-grid-slot img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .game-target-banner {
+    flex-wrap: wrap;
+  }
+
+  .game-target-banner strong {
+    min-width: 100px;
+  }
+
+  .game-scoreboard {
+    font-size: 8px;
+  }
+
+  .game-container {
+    min-height: 600px;
+    padding: 12px;
+  }
+}
