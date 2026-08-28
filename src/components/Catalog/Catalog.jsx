@@ -1,28 +1,23 @@
-import { useMemo, useState } from "react";
-import { getItemsWithRecipes } from "../../utils/itemUtils";
+import { useState } from "react";
 
+import { getRecipeItems } from "../../utils/items";
 import CatalogSidebar from "./CatalogSidebar";
 import CatalogDetail from "./CatalogDetail";
 
 export default function Catalog({ items }) {
-  const itemsWithRecipes = useMemo(() => getItemsWithRecipes(items), [items]);
+  const recipeItems = getRecipeItems(items);
 
   const [search, setSearch] = useState("");
-
   const [selectedItemName, setSelectedItemName] = useState(
-    itemsWithRecipes.length > 0 ? itemsWithRecipes[0].name : null,
+    recipeItems[0]?.name ?? null,
   );
 
-  const filteredItems = useMemo(() => {
-    const query = search.toLowerCase();
-
-    return itemsWithRecipes.filter((item) =>
-      item.displayName.toLowerCase().includes(query),
-    );
-  }, [itemsWithRecipes, search]);
+  const filteredItems = recipeItems.filter((item) =>
+    item.displayName.toLowerCase().includes(search.toLowerCase()),
+  );
 
   const selectedItem =
-    itemsWithRecipes.find((item) => item.name === selectedItemName) ||
+    recipeItems.find((item) => item.name === selectedItemName) ??
     filteredItems[0];
 
   return (

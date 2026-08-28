@@ -1,3 +1,5 @@
+import ItemImage from "../common/ItemImage";
+
 export default function CatalogSidebar({
   items,
   search,
@@ -25,13 +27,7 @@ export default function CatalogSidebar({
             }`}
           >
             {item.image ? (
-              <img
-                src={item.image}
-                alt={item.displayName}
-                width={28}
-                height={28}
-                className="item-icon"
-              />
+              <ItemImage item={item} size={28} className="item-icon" />
             ) : (
               <div className="item-icon-placeholder" />
             )}

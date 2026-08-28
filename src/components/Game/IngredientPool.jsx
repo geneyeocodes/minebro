@@ -1,4 +1,5 @@
-import { getIngredientDetails } from "../../utils/itemUtils";
+import { getItem } from "../../utils/items";
+import ItemImage from "../common/ItemImage";
 
 export default function IngredientPool({
   items,
@@ -7,27 +8,20 @@ export default function IngredientPool({
 }) {
   return (
     <div className="game-ingredient-pool">
-      {ingredients.map((ingredientName, index) => {
-        const ingredient = getIngredientDetails(items, ingredientName);
+      {ingredients.map((name, index) => {
+        const item = getItem(items, name);
 
         return (
           <div
-            key={`${ingredientName}-${index}`}
-            onClick={() => onIngredientClick(ingredientName)}
+            key={`${name}-${index}`}
+            onClick={() => onIngredientClick(name)}
             className="pool-item"
-            title={ingredientName}
+            title={name}
           >
-            {ingredient?.image ? (
-              <img
-                src={ingredient.image}
-                alt={ingredientName}
-                width={32}
-                height={32}
-              />
+            {item?.image ? (
+              <ItemImage item={item} />
             ) : (
-              <span className="pool-fallback-text">
-                {ingredientName.slice(0, 4)}
-              </span>
+              <span className="pool-fallback-text">{name.slice(0, 4)}</span>
             )}
           </div>
         );

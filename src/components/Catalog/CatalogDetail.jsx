@@ -1,3 +1,4 @@
+import ItemImage from "../common/ItemImage";
 import RecipeGrid from "./RecipeGrid";
 
 export default function CatalogDetail({ items, item, onSelectItem }) {
@@ -9,20 +10,12 @@ export default function CatalogDetail({ items, item, onSelectItem }) {
     );
   }
 
-  const recipe = item.recipes?.length > 0 ? item.recipes[0] : null;
-
   return (
     <div className="catalog-detail">
       <div className="detail-container">
         <div className="detail-header">
           {item.image ? (
-            <img
-              src={item.image}
-              alt={item.displayName}
-              width={64}
-              height={64}
-              className="detail-icon"
-            />
+            <ItemImage item={item} size={64} className="detail-icon" />
           ) : (
             <div className="detail-icon-placeholder" />
           )}
@@ -42,7 +35,7 @@ export default function CatalogDetail({ items, item, onSelectItem }) {
           <div className="recipe-box">
             <RecipeGrid
               items={items}
-              recipe={recipe}
+              recipe={item.recipe}
               onSelectItem={onSelectItem}
             />
           </div>

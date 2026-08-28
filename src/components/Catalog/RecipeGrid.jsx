@@ -1,44 +1,28 @@
-import {
-  getGridIngredients,
-  getIngredientDetails,
-} from "../../utils/itemUtils";
+import { getItem } from "../../utils/items";
+import { getIngredients } from "../../utils/recipes";
+import ItemImage from "../common/ItemImage";
 
 export default function RecipeGrid({ items, recipe, onSelectItem }) {
   if (!recipe) {
     return <p>No direct crafting recipe found.</p>;
   }
 
-  const ingredients = getGridIngredients(recipe);
-
   return (
     <div className="crafting-grid">
-      {ingredients.map((ingredientName, index) => {
-        const ingredient = getIngredientDetails(items, ingredientName);
-
-        const hasRecipe = ingredient?.recipes?.length > 0;
+      {getIngredients(recipe).map((name, index) => {
+        const item = getItem(items, name);
+        const clickable = Boolean(item?.recipe);
 
         return (
           <div
             key={index}
-            onClick={() => {
-              if (hasRecipe) {
-                onSelectItem(ingredient.name);
-              }
-            }}
-            className={`crafting-slot ${hasRecipe ? "clickable" : ""}`}
+            onClick={() => clickable && onSelectItem(item.name)}
+            className={`crafting-slot ${clickable ? "clickable" : ""}`}
           >
-            {ingredient?.image ? (
-              <img
-                src={ingredient.image}
-                alt={ingredientName}
-                title={ingredient.displayName}
-                width={32}
-                height={32}
-              />
+            {item?.image ? (
+              <ItemImage item={item} />
             ) : (
-              <span className="slot-fallback-text">
-                {ingredientName ? ingredientName.slice(0, 4) : ""}
-              </span>
+              <span className="slot-fallback-text">{name?.slice(0, 4)}</span>
             )}
           </div>
         );

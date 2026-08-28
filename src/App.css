@@ -1,5 +1,5 @@
 /* =========================================================
-   MineBroo — Minecraft-inspired UI
+   MineBro — Minecraft-inspired UI
    ========================================================= */
 
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
@@ -31,8 +31,21 @@
   font-family: "Press Start 2P", monospace;
 }
 
+/* =========================================================
+   Global Reset
+   ========================================================= */
+
 * {
   box-sizing: border-box;
+
+  /*
+   * Prevent accidental text selection when clicking quickly.
+   * This is especially useful for the game grid and inventory.
+   */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 html,
@@ -54,20 +67,58 @@ body {
     );
 
   color: var(--text);
+
+  /*
+   * Prevent dragging the page/images from feeling like
+   * selectable desktop content.
+   */
+  -webkit-user-drag: none;
+}
+
+/*
+ * Images should never be draggable in the game/catalog.
+ */
+img {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -moz-user-select: none;
+  user-drag: none;
+
+  pointer-events: none;
+}
+
+/*
+ * The search box is real text input, so restore normal
+ * text selection/cursor behavior there.
+ */
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+
+  -webkit-user-drag: auto;
 }
 
 /* =========================================================
    Main App
    ========================================================= */
 
-.app-container {
+.app {
   min-height: 100vh;
+
   background: radial-gradient(
     circle at top,
     rgba(80, 130, 55, 0.12),
     transparent 40%
   );
 }
+
+/* =========================================================
+   Header
+   ========================================================= */
 
 .app-header {
   height: 88px;
@@ -220,6 +271,12 @@ body {
   box-shadow:
     inset 3px 3px 0 #0c0e0c,
     2px 2px 0 #111;
+
+  /*
+   * Search input is intentionally selectable.
+   */
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .search-input::placeholder {
@@ -785,6 +842,13 @@ body {
   transition:
     background 0.08s,
     transform 0.08s;
+
+  /*
+   * Explicitly prevent selection on fast clicks.
+   */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
 }
 
 .game-grid-slot:hover {
@@ -883,6 +947,14 @@ body {
   transition:
     transform 0.08s,
     background 0.08s;
+
+  /*
+   * Prevent accidental selection/dragging while rapidly
+   * clicking ingredients.
+   */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
 }
 
 .pool-item:hover {
@@ -933,6 +1005,14 @@ body {
 img {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+
+  /*
+   * Never allow images to be dragged or selected.
+   */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 /* =========================================================

@@ -1,23 +1,23 @@
-import { useState } from "react";
-import sampleItems from "./data/sampleItems.json";
 import "./App.css";
+import { useState } from "react";
 
-import Header from "./components/Header";
-import Catalog from "./components/Catalog/Catalog";
-import Game from "./components/Game/Game";
+import gameItems from "./data/gameItems.json";
+import Header from "./components/common/Header";
+import Catalog from "./components/catalog/Catalog";
+import Game from "./components/game/Game";
 
 export default function App() {
   const [view, setView] = useState("game");
 
   return (
-    <div className="app-container">
+    <div className="app">
       <Header view={view} onViewChange={setView} />
 
       <main className="app-content">
         {view === "game" ? (
-          <Game items={sampleItems} />
+          <Game items={gameItems} />
         ) : (
-          <Catalog items={sampleItems} />
+          <Catalog items={gameItems} />
         )}
       </main>
     </div>

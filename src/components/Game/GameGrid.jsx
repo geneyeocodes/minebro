@@ -1,6 +1,6 @@
-import { getIngredientDetails } from "../../utils/itemUtils";
-
-const KEY_LABELS = ["Q", "W", "E", "A", "S", "D", "Z", "X", "C"];
+import { getItem } from "../../utils/items";
+import { KEY_LABELS } from "../../utils/game";
+import ItemImage from "../common/ItemImage";
 
 export default function GameGrid({
   items,
@@ -10,27 +10,20 @@ export default function GameGrid({
 }) {
   return (
     <div className="game-player-grid">
-      {playerGrid.map((ingredientName, index) => {
-        const ingredient = getIngredientDetails(items, ingredientName);
-
-        const isSelected = selectedSlotIndex === index;
+      {playerGrid.map((name, index) => {
+        const item = getItem(items, name);
 
         return (
           <div
             key={index}
             onClick={() => onSlotClick(index)}
-            className={`game-grid-slot ${isSelected ? "selected" : ""}`}
+            className={`game-grid-slot ${
+              selectedSlotIndex === index ? "selected" : ""
+            }`}
           >
             <span className="game-slot-key">{KEY_LABELS[index]}</span>
 
-            {ingredient?.image && (
-              <img
-                src={ingredient.image}
-                alt={ingredientName}
-                width={32}
-                height={32}
-              />
-            )}
+            <ItemImage item={item} />
           </div>
         );
       })}

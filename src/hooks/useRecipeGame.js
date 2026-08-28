@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { getItemsWithRecipes } from "../utils/itemUtils";
-import { getUniqueIngredients, recipesMatch } from "../utils/recipeUtils";
+import { useEffect, useState } from "react";
 
-const GAME_DURATION = 60;
+import { getRecipeItems } from "../utils/items";
+import { getUniqueIngredients, recipeMatches } from "../utils/recipes";
+import { GAME_DURATION, KEY_TO_SLOT } from "../utils/game";
 
 export default function useRecipeGame(items) {
-  const itemsWithRecipes = getItemsWithRecipes(items);
+  const recipeItems = getRecipeItems(items);
 
   const [gameState, setGameState] = useState("idle");
   const [score, setScore] = useState(0);
@@ -15,113 +15,82 @@ export default function useRecipeGame(items) {
   const [availableIngredients, setAvailableIngredients] = useState([]);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState(null);
 
-  const startNewRound = useCallback(() => {
-    if (itemsWithRecipes.length === 0) {
-      return;
-    }
+  function startNewRound() {
+    if (!recipeItems.length) return;
 
-    const randomItem =
-      itemsWithRecipes[Math.floor(Math.random() * itemsWithRecipes.length)];
+    const target = recipeItems[Math.floor(Math.random() * recipeItems.length)];
 
-    const recipe = randomItem.recipes[0];
+    const correctIngredients = getUniqueIngredients(target.recipe);
 
-    const correctIngredients = getUniqueIngredients(recipe);
-
-    const otherItems = itemsWithRecipes
+    const distractors = recipeItems
       .filter(
         (item) =>
-          item.name !== randomItem.name &&
-          !correctIngredients.includes(item.name),
+          item.name !== target.name && !correctIngredients.includes(item.name),
       )
-      .sort(() => 0.5 - Math.random())
-      .slice(0, Math.max(0, 9 - correctIngredients.length))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 9 - correctIngredients.length)
       .map((item) => item.name);
 
-    const pool = [...correctIngredients, ...otherItems].sort(
-      () => 0.5 - Math.random(),
+    const ingredients = [...correctIngredients, ...distractors].sort(
+      () => Math.random() - 0.5,
     );
 
-    setTargetItem(randomItem);
+    setTargetItem(target);
     setPlayerGrid(Array(9).fill(null));
     setSelectedSlotIndex(null);
-    setAvailableIngredients(pool);
-  }, [itemsWithRecipes]);
+    setAvailableIngredients(ingredients);
+  }
 
-  const startGame = useCallback(() => {
+  function startGame() {
     setScore(0);
     setTimeLeft(GAME_DURATION);
     setGameState("playing");
-
     startNewRound();
-  }, [startNewRound]);
+  }
 
-  const skipItem = useCallback(() => {
+  function skipItem() {
+    if (gameState === "playing") {
+      startNewRound();
+    }
+  }
+
+  function updateGrid(grid) {
+    setPlayerGrid(grid);
+
+    if (targetItem && recipeMatches(targetItem.recipe, grid)) {
+      setScore((currentScore) => currentScore + 1);
+      startNewRound();
+    }
+  }
+
+  function selectSlot(index) {
     if (gameState !== "playing") return;
 
-    startNewRound();
-  }, [gameState, startNewRound]);
-
-  const finishRound = useCallback(
-    (grid) => {
-      if (!targetItem) return;
-
-      const recipe = targetItem.recipes[0];
-      const isCorrect = recipesMatch(recipe, grid);
-
-      if (isCorrect) {
-        setScore((previous) => previous + 1);
-        startNewRound();
-      }
-    },
-    [targetItem, startNewRound],
-  );
-
-  const selectSlot = useCallback(
-    (index) => {
-      if (gameState !== "playing") return;
-
-      if (playerGrid[index] !== null) {
-        const newGrid = [...playerGrid];
-        newGrid[index] = null;
-
-        setPlayerGrid(newGrid);
-        setSelectedSlotIndex(index);
-
-        finishRound(newGrid);
-        return;
-      }
-
-      setSelectedSlotIndex((current) => (current === index ? null : index));
-    },
-    [gameState, playerGrid, finishRound],
-  );
-
-  const selectIngredient = useCallback(
-    (ingredientName) => {
-      if (gameState !== "playing" || selectedSlotIndex === null) {
-        return;
-      }
-
+    // Clicking an occupied slot removes the item.
+    if (playerGrid[index] !== null) {
       const newGrid = [...playerGrid];
+      newGrid[index] = null;
 
-      newGrid[selectedSlotIndex] = ingredientName;
+      setSelectedSlotIndex(index);
+      updateGrid(newGrid);
+      return;
+    }
 
-      setPlayerGrid(newGrid);
-      setSelectedSlotIndex(null);
+    // Clicking an empty slot selects/deselects it.
+    setSelectedSlotIndex((current) => (current === index ? null : index));
+  }
 
-      finishRound(newGrid);
-    },
-    [gameState, playerGrid, selectedSlotIndex, finishRound],
-  );
-
-  const clearSelectedSlot = useCallback(() => {
-    if (selectedSlotIndex === null) return;
+  function selectIngredient(name) {
+    if (gameState !== "playing" || selectedSlotIndex === null) {
+      return;
+    }
 
     const newGrid = [...playerGrid];
-    newGrid[selectedSlotIndex] = null;
+    newGrid[selectedSlotIndex] = name;
 
-    setPlayerGrid(newGrid);
-  }, [playerGrid, selectedSlotIndex]);
+    setSelectedSlotIndex(null);
+    updateGrid(newGrid);
+  }
 
   // Timer
   useEffect(() => {
@@ -133,7 +102,7 @@ export default function useRecipeGame(items) {
     }
 
     const timer = setInterval(() => {
-      setTimeLeft((previous) => previous - 1);
+      setTimeLeft((time) => time - 1);
     }, 1000);
 
     return () => clearInterval(timer);
@@ -143,42 +112,26 @@ export default function useRecipeGame(items) {
   useEffect(() => {
     if (gameState !== "playing") return;
 
-    const keyMap = {
-      q: 0,
-      w: 1,
-      e: 2,
-      a: 3,
-      s: 4,
-      d: 5,
-      z: 6,
-      x: 7,
-      c: 8,
-    };
-
-    const handleKeyDown = (event) => {
+    function handleKeyDown(event) {
       if (event.code === "Space") {
         event.preventDefault();
         skipItem();
         return;
       }
 
-      if (event.code === "Backspace" || event.code === "Delete") {
-        event.preventDefault();
-        clearSelectedSlot();
-        return;
-      }
-
-      const index = keyMap[event.key.toLowerCase()];
+      const index = KEY_TO_SLOT[event.key.toLowerCase()];
 
       if (index !== undefined) {
         selectSlot(index);
       }
-    };
+    }
 
     window.addEventListener("keydown", handleKeyDown);
 
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [gameState, skipItem, clearSelectedSlot, selectSlot]);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [gameState, playerGrid, selectedSlotIndex, targetItem]);
 
   return {
     gameState,
@@ -188,7 +141,6 @@ export default function useRecipeGame(items) {
     playerGrid,
     availableIngredients,
     selectedSlotIndex,
-
     startGame,
     skipItem,
     selectSlot,
