@@ -1,7 +1,24 @@
+import { useEffect, useState } from "react";
 import ItemImage from "../common/ItemImage";
 import RecipeGrid from "./RecipeGrid";
 
 export default function CatalogDetail({ items, item, onSelectItem }) {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!item) return;
+
+    setLoading(true);
+
+    // Clear the grid immediately, then allow the new one
+    // to render on the next tick.
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [item?.name]);
+
   if (!item) {
     return (
       <div className="catalog-detail">
@@ -33,11 +50,16 @@ export default function CatalogDetail({ items, item, onSelectItem }) {
           <h3>Recipe</h3>
 
           <div className="recipe-box">
-            <RecipeGrid
-              items={items}
-              recipe={item.recipe}
-              onSelectItem={onSelectItem}
-            />
+            {loading ? (
+              <div className="recipe-loading" />
+            ) : (
+              <RecipeGrid
+                key={item.name}
+                items={items}
+                recipe={item.recipe}
+                onSelectItem={onSelectItem}
+              />
+            )}
           </div>
         </div>
       </div>
